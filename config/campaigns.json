@@ -1,0 +1,13 @@
+[
+  {"id": "CARTDM", "name": "CARTRACK_DIRECT_MARKETING", "main_code": "CARTRACK_DIRECT_MARKETING", "target": 0},
+  {"id": "CLCLGC", "name": "CLIENTELE_LEGAL", "main_code": "CLIENTELE_LEGAL", "target": 0},
+  {"id": "KPSTID", "name": "KING_PRICE_STI_AK", "main_code": "KING_PRICE_STI_AK", "target": 0},
+  {"id": "OMDEALER", "name": "OMDEALER_ALPHA", "main_code": "OMDEALER_ALPHA", "target": 0},
+  {"id": "TELESAG", "name": "TELESURE_AUTO_GENERAL", "main_code": "TELESURE_AUTO_GENERAL", "target": 0},
+  {"id": "TELESDD", "name": "TELESURE_DIRECT_DEBIT", "main_code": "TELESURE_DIRECT_DEBIT", "target": 0},
+  {"id": "TELESHO", "name": "TELESURE_HOME_OWNER", "main_code": "TELESURE_HOME_OWNER", "target": 0},
+  {"id": "TSFFW", "name": "TELESURE_FFW", "main_code": "TELESURE_FFW", "target": 0},
+  {"id": "MIWAYALF", "name": "MIWAY_ALPHA", "main_code": "MIWAY_ALPHA", "target": 0},
+  {"id": "MIWAYALP", "name": "MIWAY_ALPHA_LP", "main_code": "MIWAY_ALPHA_LP", "target": 0},
+  {"id": "CLLIFCA", "name": "CLIENTELE_LIFE_FCA", "main_code": "CLIENTELE_LIFE_FCA", "target": 0}
+]

@@ -1,0 +1,116 @@
+# Vicidial (credentials in .env)
+vicidial:
+  base_url: "http://alpha1.onvoip.co.za/vicidial/AST_agent_performance_detail.php"
+  summary_url: "http://alpha1.onvoip.co.za/vicidial/AST_timeonVDADallSUMMARY.php"
+  summary_params:
+    RR: "4"
+    DB: "0"
+    adastats: ""
+    types: "SHOW ALL CAMPAIGNS"
+  shift: "--"
+  verify_ssl: false
+  report_params:
+    DB: "0"
+    query_time: "00:00:00"
+    end_time: "23:59:59"
+    show_percentages: "checked"
+    report_display_type: "TEXT"
+    users: "--ALL--"
+
+campaigns:
+  - campaign_id: "CARTDM"
+    main_code: "CARTRACK_DIRECT_MARKETING"
+    lead_volume: 100
+  - campaign_id: "CLCLGC"
+    main_code: "CLIENTELE_LEGAL"
+    lead_volume: 10
+  - campaign_id: "CLLIFCA"
+    main_code: "CLIENTELE_LIFE_FCA"
+    lead_volume: 20
+  - campaign_id: "KPSTID"
+    main_code: "KING_PRICE_STI_AK"
+    lead_volume: 70
+  - campaign_id: "MIWAYALF"
+    main_code: "MIWAY_ALPHA"
+    lead_volume: 70
+  - campaign_id: "MIWAYALP"
+    main_code: "MIWAY_ALPHA_LP"
+    lead_volume: 50
+  - campaign_id: "OMDEALER"
+    main_code: "OMDEALER_ALPHA"
+    lead_volume: 125
+  - campaign_id: "TELESAG"
+    main_code: "TELESURE_AUTO_GENERAL"
+    lead_volume: 60
+  - campaign_id: "TELESDD"
+    main_code: "TELESURE_DIRECT_DEBIT"
+    lead_volume: 10
+  - campaign_id: "TELESHO"
+    main_code: "TELESURE_HOME_OWNER"
+    lead_volume: 50
+  - campaign_id: "TSFFW"
+    main_code: "TELESURE_FFW"
+    lead_volume: 60
+
+teams_auto_discover: false
+
+teams:
+  - user_group: "TeamKhayalethu"
+    display_name: "Team Khaya"
+    target: 220
+  - user_group: "TeamThanduxolo"
+    display_name: "Team Thanduxolo"
+    target: 220
+  - user_group: "TeamAyabonga"
+    display_name: "Team Ayabonga"
+    target: 212
+  - user_group: "TeamIsipho"
+    display_name: "Team Isipho"
+    target: 91
+  - user_group: "Trainees"
+    display_name: "Trainees"
+    target: 120
+
+sales_statuses:
+  - "SALE"
+
+b_sales_statuses:
+  - "BSALE"
+
+hours_source: "nonpause"
+
+# Schedule: see src/schedule_rules.py
+schedule:
+  interval_seconds: 1800
+
+  weekdays:
+    start_time: "08:30"
+    good_morning_time: "08:30"
+    good_morning_caption: "Good morning"
+    stop_time: "19:10"
+    tea_time: "10:01"
+    tea_caption: "Tea_Time"
+    tea_resume_time: "10:30"
+    lunch_time: "13:31"
+    lunch_caption: "Lunch_Time"
+    lunch_resume_time: "14:00"
+    second_tea_time: "16:01"
+    second_tea_caption: "2nd_Tea"
+    second_tea_resume_time: "16:30"
+    eod_time: "19:10"
+
+  saturday:
+    start_time: "09:30"
+    stop_time: "13:30"
+    tea_time: "11:01"
+    tea_caption: "Tea_Time"
+    tea_resume_time: "11:30"
+
+whatsapp:
+  provider: "green_api"
+  send_as_image: true
+  use_time_caption: false
+  default_group: "120363028290712457@g.us"
+  dual_groups:
+    - "120363028290712457@g.us"
+    - "120363146984037888@g.us"

@@ -1,0 +1,7 @@
+[
+  {"name": "Team Khaya", "vicidial_group": "TeamKhayalethu", "target": 200},
+  {"name": "Team Thanduxolo", "vicidial_group": "TeamThanduxolo", "target": 200},
+  {"name": "Team Ayabonga", "vicidial_group": "TeamAyabonga", "target": 200},
+  {"name": "Team Isipho", "vicidial_group": "TeamIsipho", "target": 153},
+  {"name": "Trainees", "vicidial_group": "Trainees", "target": 100}
+]

@@ -1,0 +1,15 @@
+.env
+output/
+__pycache__/
+*.pyc
+.venv/
+venv/
+_discover.html
+test_*.html
+cookies.txt
+logs/
+*.log
+perf_*.html
+summary_*.html
+login_*.html
+.scheduler.lock
