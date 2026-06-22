@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime
 
 from src.config_loader import AppConfig
 from src.parser import sum_statuses
 from src.vicidial_client import VicidialClient
+
+log = logging.getLogger("alpha1-update")
 
 
 @dataclass
@@ -129,7 +132,14 @@ class PerformanceReportBuilder:
     def build(self, report_date: date | None = None) -> PerformanceReport:
         report_day = report_date or date.today()
         teams = self._client.resolve_teams(report_date=report_day)
-        wait_times = self._client.fetch_campaign_wait_times()
+        try:
+            wait_times = self._client.fetch_campaign_wait_times()
+        except Exception as exc:
+            log.warning(
+                "Could not fetch campaign wait times; continuing without wait data: %s",
+                exc,
+            )
+            wait_times = {}
 
         team_rows: list[RowMetrics] = []
         total_headcount = 0
