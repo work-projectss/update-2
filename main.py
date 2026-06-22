@@ -334,7 +334,6 @@ def main() -> None:
                     return
                 try:
                     _run_send_job(send=send)
-                    _run_send_job(send=send)
                 finally:
                     _SEND_LOCK.release()
 
