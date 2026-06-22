@@ -27,6 +27,7 @@ from src.schedule_rules import (  # noqa: E402
     active_window_label,
     get_caption,
     list_todays_fire_times,
+    local_now,
     next_run_after_suspend,
     reload_rules,
     run_key,
@@ -44,6 +45,8 @@ logging.basicConfig(
 log = logging.getLogger("alpha1-update")
 
 _MUTEX_NAME = "Alpha1WhatsAppScheduler_Update2"
+_MUTEX_HANDLE = None
+_LOCK_FILE_HANDLE = None
 _SEND_LOCK = threading.Lock()
 _SEND_JOB_TIMEOUT_SEC = 600
 _GRACE_MINUTES = 10
@@ -104,7 +107,7 @@ def _mark_run_sent(now: datetime) -> None:
 def _write_heartbeat() -> None:
     path = ROOT / "logs" / "scheduler.heartbeat"
     path.parent.mkdir(exist_ok=True)
-    path.write_text(datetime.now().isoformat(timespec="seconds"), encoding="utf-8")
+    path.write_text(local_now().isoformat(timespec="seconds"), encoding="utf-8")
 
 
 def _send_hold_until(now: datetime) -> datetime | None:
@@ -126,8 +129,24 @@ def _send_hold_until(now: datetime) -> datetime | None:
 
 
 def _acquire_mutex() -> bool:
-    handle = ctypes.windll.kernel32.CreateMutexW(None, True, _MUTEX_NAME)
-    return ctypes.windll.kernel32.GetLastError() != 183
+    global _LOCK_FILE_HANDLE, _MUTEX_HANDLE
+    if sys.platform.startswith("win"):
+        handle = ctypes.windll.kernel32.CreateMutexW(None, True, _MUTEX_NAME)
+        _MUTEX_HANDLE = handle
+        return ctypes.windll.kernel32.GetLastError() != 183
+
+    import fcntl
+
+    path = ROOT / "logs" / "scheduler.lock"
+    path.parent.mkdir(exist_ok=True)
+    handle = path.open("w", encoding="utf-8")
+    try:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        handle.close()
+        return False
+    _LOCK_FILE_HANDLE = handle
+    return True
 
 
 def run_update(
@@ -148,7 +167,7 @@ def run_update(
         len(config.campaigns),
     )
     report = builder.build(report_date=report_date)
-    generated_at = datetime.now()
+    generated_at = local_now()
     message = format_whatsapp_message(report, generated_at=generated_at)
 
     image_path = None
@@ -186,7 +205,7 @@ def _resolve_fire_time(now: datetime, *, force: bool) -> datetime | None:
 
 
 def _run_if_scheduled(*, send: bool, force: bool) -> int:
-    now = datetime.now()
+    now = local_now()
     reload_rules()
 
     fire_at = _resolve_fire_time(now, force=force)
@@ -284,7 +303,7 @@ def main() -> None:
 
     if args.check_schedule:
         reload_rules()
-        now = datetime.now()
+        now = local_now()
         print("Now:", now.strftime("%A %Y-%m-%d %H:%M"))
         print("Window:", active_window_label(now))
         print("Active now:", should_run(now))

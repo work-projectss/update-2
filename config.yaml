@@ -81,6 +81,7 @@ hours_source: "nonpause"
 
 # Schedule: see src/schedule_rules.py
 schedule:
+  timezone: "Africa/Johannesburg"
   interval_seconds: 1800
 
   weekdays:

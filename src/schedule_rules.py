@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, time as dtime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 DUAL_CAPTIONS = frozenset({"TEA_TIME", "LUNCH_TIME", "2ND_TEA", "2ND_TIME"})
 
@@ -98,6 +99,11 @@ def _time_to_minutes(t: dtime) -> int:
     return t.hour * 60 + t.minute
 
 
+def local_now() -> datetime:
+    """Current wall-clock time in the configured business timezone."""
+    return datetime.now(_timezone()).replace(tzinfo=None)
+
+
 def _bold_whatsapp(label: str) -> str:
     clean = label.strip().strip("*")
     return f"*{clean}*"
@@ -123,7 +129,7 @@ def _in_time_window(clock: dtime, start: dtime, stop: dtime) -> bool:
 
 def should_run(now: datetime | None = None) -> bool:
     """Broad active window (Mon-Fri or Sat)."""
-    now = now or datetime.now()
+    now = now or local_now()
     clock = _clock(now)
     rules = _rules()
     wd = now.weekday()
@@ -200,7 +206,7 @@ def is_regular_slot(now: datetime) -> bool:
 
 def should_fire_now(now: datetime | None = None) -> bool:
     """True at exact send times: regular :00/:30 grid + weekday specials."""
-    now = now or datetime.now()
+    now = now or local_now()
     if not should_run(now):
         return False
     return is_regular_slot(now) or is_special_slot(now)
@@ -216,7 +222,7 @@ def get_caption(now: datetime | None = None) -> str:
     Other regular slots: no caption (image only).
     Special slots: bold Tea_Time, Lunch_Time, 2nd_Time (Mon-Fri + Sat Tea).
     """
-    now = now or datetime.now()
+    now = now or local_now()
     if not should_fire_now(now):
         return ""
 
@@ -234,7 +240,7 @@ def get_caption(now: datetime | None = None) -> str:
 
 
 def active_window_label(now: datetime | None = None) -> str:
-    now = now or datetime.now()
+    now = now or local_now()
     wd = now.weekday()
     rules = _rules()
     if wd <= 4:
@@ -255,7 +261,7 @@ def active_window_label(now: datetime | None = None) -> str:
 
 
 def next_run_after_suspend(now: datetime | None = None) -> datetime:
-    now = now or datetime.now()
+    now = now or local_now()
     rules = _rules()
     days_ahead = (7 - now.weekday()) % 7 or 7
     target = now.date() + timedelta(days=days_ahead)
@@ -264,7 +270,7 @@ def next_run_after_suspend(now: datetime | None = None) -> datetime:
 
 def list_todays_fire_times(now: datetime | None = None) -> list[str]:
     """Debug helper: all HH:MM send times for today."""
-    now = now or datetime.now()
+    now = now or local_now()
     rules = _rules()
     wd = now.weekday()
     times: list[str] = []
@@ -290,6 +296,7 @@ def list_todays_fire_times(now: datetime | None = None) -> list[str]:
 
 _use_time_caption_cache: bool | None = None
 _rules_cache: ScheduleRules | None = None
+_timezone_cache: ZoneInfo | None = None
 
 
 def _use_time_caption() -> bool:
@@ -320,7 +327,22 @@ def _rules() -> ScheduleRules:
     return _rules_cache
 
 
+def _timezone() -> ZoneInfo:
+    global _timezone_cache
+    if _timezone_cache is None:
+        import yaml
+        from pathlib import Path
+
+        path = Path(__file__).resolve().parent.parent / "config.yaml"
+        with path.open(encoding="utf-8") as f:
+            raw = yaml.safe_load(f)
+        tz_name = str(raw.get("schedule", {}).get("timezone", "Africa/Johannesburg"))
+        _timezone_cache = ZoneInfo(tz_name)
+    return _timezone_cache
+
+
 def reload_rules() -> None:
-    global _rules_cache, _use_time_caption_cache
+    global _rules_cache, _use_time_caption_cache, _timezone_cache
     _rules_cache = None
     _use_time_caption_cache = None
+    _timezone_cache = None
