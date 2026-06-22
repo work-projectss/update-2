@@ -332,9 +332,9 @@ def main() -> None:
 
         log.info("Scheduler started. %s", active_window_label())
         log.info(
-            "Mon-Fri 08:30 Good morning (single), then 30 min image-only + "
-            "10:01 Tea_Time, 13:31 Lunch_Time, 16:01 2nd_Tea, 19:10 EOD (both groups). "
-            "Sat 09:30-13:30 every 30 min + 11:01 Tea_Time (both groups)."
+            "Mon-Fri regular slots are image-only to the default group; "
+            "10:01 Tea_Time, 13:31 Lunch_Time, and 16:01 2nd_Time go to both groups. "
+            "Sat 09:30-13:30 every 30 min + 11:01 Tea_Time to both groups."
         )
         try:
             scheduler.start()

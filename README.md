@@ -14,7 +14,9 @@ copy .env.example .env
 Edit `.env`:
 
 - `VICIDIAL_USER` / `VICIDIAL_PASSWORD` — report login
-- `GREEN_API_INSTANCE_ID` / `GREEN_API_TOKEN` / `WHATSAPP_TO` — Green API (group id ends with `@g.us`)
+- `GREEN_API_URL` / `GREEN_API_INSTANCE_ID` / `GREEN_API_TOKEN` — Green API
+- `WHATSAPP_TO` — regular update group id ending with `@g.us`
+- `WHATSAPP_TO_LUNCH_EOD` — special update group ids ending with `@g.us`
 
 Edit `config.yaml` for campaigns, team targets, and schedule.
 
@@ -22,11 +24,12 @@ Edit `config.yaml` for campaigns, team targets, and schedule.
 
 | Day | Active | Interval | Special captions |
 |-----|--------|----------|----------------|
-| **Mon–Fri** | 08:30 – 19:02 | 30 min | **\*LUNCH_TIME\*** at 13:30, normal from 14:00, **\*EOD\*** at 19:02 |
-| **Saturday** | 09:30 – 13:02 | 30 min | `Tea_Time` at 11:00, normal from 11:30, **\*EOD\*** at 13:02 |
+| **Mon–Fri** | 08:30 – 19:10 | 30 min | **\*Tea_Time\*** at 10:01, **\*Lunch_Time\*** at 13:31, **\*2nd_Time\*** at 16:01 |
+| **Saturday** | 09:30 – 13:30 | 30 min | **\*Tea_Time\*** at 11:01 |
 | **Sunday** | Off | — | Suspended until Monday 08:30 |
 
-**Dual WhatsApp groups** (`lunch_eod_groups` in `config.yaml`): Mon–Fri **LUNCH_TIME** + **EOD**; Saturday **Tea_Time** + **EOD**. All other slots use `WHATSAPP_TO` only.
+Regular updates are PNG images with no caption and go only to `WHATSAPP_TO`.
+Special captions (`Tea_Time`, `Lunch_Time`, `2nd_Time`) go to every id in `WHATSAPP_TO_LUNCH_EOD`.
 
 Check the current slot:
 

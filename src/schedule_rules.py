@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, time as dtime
 from typing import Any
 
-DUAL_CAPTIONS = frozenset({"TEA_TIME", "LUNCH_TIME", "2ND_TEA", "EOD"})
+DUAL_CAPTIONS = frozenset({"TEA_TIME", "LUNCH_TIME", "2ND_TEA", "2ND_TIME"})
 
 
 @dataclass(frozen=True)
@@ -66,7 +66,7 @@ class ScheduleRules:
                 lunch_caption=str(wd.get("lunch_caption", "Lunch_Time")),
                 lunch_resume_at=_parse_time(wd.get("lunch_resume_time", "13:30")),
                 second_tea_at=_parse_time(wd.get("second_tea_time", "16:01")),
-                second_tea_caption=str(wd.get("second_tea_caption", "2nd_Tea")),
+                second_tea_caption=str(wd.get("second_tea_caption", "2nd_Time")),
                 second_tea_resume_at=_parse_time(
                     wd.get("second_tea_resume_time", "16:30")
                 ),
@@ -108,7 +108,7 @@ def caption_label(caption: str) -> str:
 
 
 def uses_dual_groups(caption: str) -> bool:
-    """Tea_Time, Lunch_Time, 2nd_Tea, EOD -> both WhatsApp groups."""
+    """Tea_Time, Lunch_Time, 2nd_Time -> both WhatsApp groups."""
     return caption_label(caption) in DUAL_CAPTIONS
 
 
@@ -142,8 +142,6 @@ def _weekday_special_at(clock: dtime) -> str | None:
         return w.lunch_caption
     if clock == w.second_tea_at:
         return w.second_tea_caption
-    if clock == w.eod_at:
-        return "EOD"
     return None
 
 
@@ -190,9 +188,6 @@ def is_regular_slot(now: datetime) -> bool:
         w = rules.weekday
         if not _in_time_window(clock, w.start, w.stop):
             return False
-        # 19:10 is EOD special only (not a :00/:30 regular slot at 19:10)
-        if clock == w.eod_at:
-            return False
         if _skip_regular_before_lunch(clock, w):
             return False
         return True
@@ -218,9 +213,8 @@ def run_key(now: datetime) -> str:
 
 def get_caption(now: datetime | None = None) -> str:
     """
-    Mon-Fri 08:30: *Good morning* (single group).
     Other regular slots: no caption (image only).
-    Special slots: bold Tea_Time, Lunch_Time, 2nd_Tea, EOD (Mon-Fri + Sat Tea).
+    Special slots: bold Tea_Time, Lunch_Time, 2nd_Time (Mon-Fri + Sat Tea).
     """
     now = now or datetime.now()
     if not should_fire_now(now):
@@ -229,7 +223,7 @@ def get_caption(now: datetime | None = None) -> str:
     clock = _clock(now)
     if now.weekday() <= 4:
         w = _rules().weekday
-        if clock == w.good_morning_at:
+        if clock == w.good_morning_at and w.good_morning_caption.strip():
             return _bold_whatsapp(w.good_morning_caption)
 
     special = _special_caption_at(now)
@@ -247,9 +241,9 @@ def active_window_label(now: datetime | None = None) -> str:
         w = rules.weekday
         return (
             f"Mon-Fri {w.start.strftime('%H:%M')}-{w.stop.strftime('%H:%M')} "
-            f"(Good morning {w.good_morning_at.strftime('%H:%M')}, "
+            f"(regular image-only from {w.start.strftime('%H:%M')}, "
             f"Tea {w.tea_at.strftime('%H:%M')}, Lunch {w.lunch_at.strftime('%H:%M')}, "
-            f"2nd_Tea {w.second_tea_at.strftime('%H:%M')}, EOD {w.eod_at.strftime('%H:%M')})"
+            f"2nd_Time {w.second_tea_at.strftime('%H:%M')})"
         )
     if wd == 5:
         s = rules.saturday

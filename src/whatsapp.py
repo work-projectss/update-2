@@ -128,19 +128,22 @@ class WhatsAppSender:
         log.info("Twilio message sent to %s", to_num)
 
     # --- Green API (legacy) ---
-    def _green_api_base(self) -> tuple[str, str]:
+    def _green_api_base(self) -> tuple[str, str, str]:
+        base = _env("GREEN_API_URL", "GREENAPI_URL").rstrip("/")
+        if not base:
+            base = "https://api.green-api.com"
         instance = _env("GREEN_API_INSTANCE_ID", "GREENAPI_ID_INSTANCE")
         token = _env("GREEN_API_TOKEN", "GREENAPI_API_TOKEN")
         if not instance or not token:
             raise ValueError(
                 "Set GREEN_API_INSTANCE_ID and GREEN_API_TOKEN (or GREENAPI_* in .env)"
             )
-        return instance, token
+        return base, instance, token
 
     def _send_green_api_text(self, chat_id: str, message: str) -> None:
-        instance, token = self._green_api_base()
+        base, instance, token = self._green_api_base()
         url = (
-            f"https://api.green-api.com/waInstance{instance}"
+            f"{base}/waInstance{instance}"
             f"/sendMessage/{token}"
         )
         response = requests.post(
@@ -152,9 +155,9 @@ class WhatsAppSender:
         log.info("Green API message sent to %s", chat_id)
 
     def _send_green_api_file(self, chat_id: str, image_path: Path, caption: str) -> None:
-        instance, token = self._green_api_base()
+        base, instance, token = self._green_api_base()
         url = (
-            f"https://api.green-api.com/waInstance{instance}"
+            f"{base}/waInstance{instance}"
             f"/sendFileByUpload/{token}"
         )
         with image_path.open("rb") as handle:

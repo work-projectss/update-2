@@ -177,7 +177,7 @@ def load_config(config_path: Path | None = None) -> AppConfig:
             raw.get("schedule", {}).get("weekdays", {}).get("start_time", "08:30")
         ),
         stop_time=_parse_time(
-            raw.get("schedule", {}).get("weekdays", {}).get("stop_time", "19:02")
+            raw.get("schedule", {}).get("weekdays", {}).get("stop_time", "19:10")
         ),
         whatsapp_provider=provider,
         whatsapp_send_as_image=bool(whatsapp_cfg.get("send_as_image", True)),

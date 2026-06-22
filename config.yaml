@@ -86,7 +86,7 @@ schedule:
   weekdays:
     start_time: "08:30"
     good_morning_time: "08:30"
-    good_morning_caption: "Good morning"
+    good_morning_caption: ""
     stop_time: "19:10"
     tea_time: "10:01"
     tea_caption: "Tea_Time"
@@ -95,7 +95,7 @@ schedule:
     lunch_caption: "Lunch_Time"
     lunch_resume_time: "14:00"
     second_tea_time: "16:01"
-    second_tea_caption: "2nd_Tea"
+    second_tea_caption: "2nd_Time"
     second_tea_resume_time: "16:30"
     eod_time: "19:10"
 

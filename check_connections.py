@@ -36,11 +36,22 @@ def check_vicidial() -> tuple[bool, str]:
 
 
 def check_green_api() -> tuple[bool, str]:
-    instance = os.environ.get("GREEN_API_INSTANCE_ID", "").strip()
-    token = os.environ.get("GREEN_API_TOKEN", "").strip()
+    base = (
+        os.environ.get("GREEN_API_URL", "").strip()
+        or os.environ.get("GREENAPI_URL", "").strip()
+        or "https://api.green-api.com"
+    ).rstrip("/")
+    instance = (
+        os.environ.get("GREEN_API_INSTANCE_ID", "").strip()
+        or os.environ.get("GREENAPI_ID_INSTANCE", "").strip()
+    )
+    token = (
+        os.environ.get("GREEN_API_TOKEN", "").strip()
+        or os.environ.get("GREENAPI_API_TOKEN", "").strip()
+    )
     if not instance or not token:
         return False, "Missing GREEN_API_INSTANCE_ID or GREEN_API_TOKEN in .env"
-    url = f"https://api.green-api.com/waInstance{instance}/getStateInstance/{token}"
+    url = f"{base}/waInstance{instance}/getStateInstance/{token}"
     try:
         r = requests.get(url, timeout=30)
         data = r.json()
