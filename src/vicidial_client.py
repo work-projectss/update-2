@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import re
+import logging
+import time
 from datetime import date
 
 import requests
@@ -14,6 +16,7 @@ from src.parser import (
 )
 from src.summary_wait import parse_campaign_wait_times
 
+log = logging.getLogger("alpha1-update")
 _TEAM_PREFIX = re.compile(r"^Team", re.I)
 
 
@@ -28,6 +31,28 @@ class VicidialClient:
         self._session.verify = config.vicidial_verify_ssl
         if not config.vicidial_verify_ssl:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    def _get(self, url: str, *, params: list[tuple[str, str]] | dict[str, str]) -> requests.Response:
+        last_error: Exception | None = None
+        for attempt in range(1, 5):
+            try:
+                response = self._session.get(url, params=params, timeout=120)
+                response.raise_for_status()
+                return response
+            except requests.RequestException as exc:
+                last_error = exc
+                if attempt == 4:
+                    break
+                delay = attempt * 2
+                log.warning(
+                    "Vicidial request failed (attempt %d/4); retrying in %ss: %s",
+                    attempt,
+                    delay,
+                    exc,
+                )
+                time.sleep(delay)
+        assert last_error is not None
+        raise last_error
 
     def _report_date_str(self, report_date: date | None) -> str:
         return (report_date or date.today()).isoformat()
@@ -77,12 +102,7 @@ class VicidialClient:
         params = self._report_params(
             query_date=d, campaigns=campaigns, user_groups=user_groups
         )
-        response = self._session.get(
-            self._config.vicidial_base_url,
-            params=params,
-            timeout=120,
-        )
-        response.raise_for_status()
+        response = self._get(self._config.vicidial_base_url, params=params)
         if "Invalid Username/Password" in response.text:
             raise PermissionError("Vicidial rejected credentials")
         if "not allowed to view this report" in response.text:
@@ -147,10 +167,8 @@ class VicidialClient:
         return sorted(merged, key=lambda t: t.display_name.lower())
 
     def fetch_campaign_wait_times(self) -> dict[str, int]:
-        response = self._session.get(
+        response = self._get(
             self._config.vicidial_summary_url,
             params=self._config.vicidial_summary_params,
-            timeout=120,
         )
-        response.raise_for_status()
         return parse_campaign_wait_times(response.text)
