@@ -15,6 +15,7 @@ from src.report import GrandTotals, PerformanceReport, RowMetrics
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
 COLOR_RED = (255, 0, 0)
+COLOR_LIGHT_GREEN = (198, 239, 206)
 
 TABLE_TOP = 55
 ROW_HEIGHT = 24
@@ -24,8 +25,9 @@ FONT_SIZE = 13
 RENDER_SCALE = 3
 HEADER_PAD = 10
 
-# Campaign columns: 0 Campaign, 1 Vicidial ID, 2 Main Code, 3 Lead Vol, ...
+# Campaign columns: 0 Campaign, 1 Vicidial ID, 2 Main Code, 3 Lead Vol, 4 Sales, ...
 C_VICIDIAL = 1
+C_SALES = 4
 C_HEADCOUNT = 7
 
 _MIN_CAMPAIGN_W = 200
@@ -157,14 +159,32 @@ def _cell(
         y_cur += lh + line_gap
 
 
-def _campaign_styles(values: list[str], *, is_total: bool = False) -> list[CellStyle]:
+def _campaign_target_met(row: RowMetrics) -> bool:
+    """Sales column meets Lead Volume target (Sales >= Lead Vol)."""
+    if row.target <= 0:
+        return False
+    return row.sales >= row.target
+
+
+def _campaign_styles(
+    values: list[str],
+    *,
+    is_total: bool = False,
+    row: RowMetrics | None = None,
+) -> list[CellStyle]:
     styles: list[CellStyle] = []
+    sales_met = (
+        not is_total
+        and row is not None
+        and _campaign_target_met(row)
+    )
     for col in range(len(values)):
         text_c = COLOR_RED if col == C_VICIDIAL and not is_total else COLOR_BLACK
         font_key = "total" if is_total else "regular"
         if col == C_HEADCOUNT and not is_total:
             font_key = "italic"
-        styles.append(CellStyle(text=text_c, font_key=font_key))
+        fill = COLOR_LIGHT_GREEN if col == C_SALES and sales_met else COLOR_WHITE
+        styles.append(CellStyle(fill=fill, text=text_c, font_key=font_key))
     return styles
 
 
@@ -387,7 +407,10 @@ def generate_report_image(
     )
 
     campaign_rows = [_campaign_row_values(r) for r in report.campaign_rows]
-    campaign_styles = [_campaign_styles(r) for r in campaign_rows]
+    campaign_styles = [
+        _campaign_styles(vals, row=row)
+        for vals, row in zip(campaign_rows, report.campaign_rows)
+    ]
     grand_c = _grand_campaign(report.campaign_grand, report.campaign_target_total)
     campaign_rows.append(grand_c)
     campaign_styles.append(_campaign_styles(grand_c, is_total=True))

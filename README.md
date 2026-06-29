@@ -2,7 +2,13 @@
 
 Pulls **Agent Performance Detail** and **Wait(sec)** from alpha1 Vicidial, builds a PNG matching your spreadsheet layout, and sends it to WhatsApp every 30 minutes via Green API.
 
-## Setup (Command Prompt)
+## New PC setup (copy folder + one click)
+
+Copy the whole `Update_2` folder (include `.env`), install Python 3.10+, then double-click **`SETUP_NEW_PC.bat`**.
+
+Full guide: **[NEW_PC_SETUP.md](NEW_PC_SETUP.md)**
+
+## Setup (manual / Command Prompt)
 
 ```cmd
 cd c:\Projects\Update_2

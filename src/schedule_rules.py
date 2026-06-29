@@ -178,6 +178,13 @@ def _skip_regular_before_lunch(clock: dtime, w: WeekdaySchedule) -> bool:
     return w.lunch_at.minute > 30
 
 
+def _skip_regular_before_eod(clock: dtime, w: WeekdaySchedule) -> bool:
+    """Skip regular :00 when EOD is later same hour (e.g. no 19:00 when EOD is 19:05)."""
+    if clock.minute != 0 or clock.hour != w.eod_at.hour:
+        return False
+    return w.eod_at.minute > 0
+
+
 def is_regular_slot(now: datetime) -> bool:
     """Every 30 minutes on :00 and :30 within the active window."""
     if now.minute not in (0, 30):
@@ -190,10 +197,12 @@ def is_regular_slot(now: datetime) -> bool:
         w = rules.weekday
         if not _in_time_window(clock, w.start, w.stop):
             return False
-        # 19:10 is EOD special only (not a :00/:30 regular slot at 19:10)
+        # EOD minute is special only (not a :00/:30 regular slot at the same time)
         if clock == w.eod_at:
             return False
         if _skip_regular_before_lunch(clock, w):
+            return False
+        if _skip_regular_before_eod(clock, w):
             return False
         return True
 

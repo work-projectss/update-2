@@ -1,4 +1,3 @@
 @echo off
-cd /d "%~dp0"
-wscript //nologo "%~dp0watchdog_hidden.vbs"
+rem Disabled - scheduler runs from C:\Projects\Update
 exit /b 0

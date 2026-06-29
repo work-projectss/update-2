@@ -69,7 +69,7 @@ teams:
     target: 91
   - user_group: "Trainees"
     display_name: "Trainees"
-    target: 120
+    target: 110
 
 sales_statuses:
   - "SALE"
@@ -87,7 +87,7 @@ schedule:
     start_time: "08:30"
     good_morning_time: "08:30"
     good_morning_caption: "Good morning"
-    stop_time: "19:10"
+    stop_time: "19:05"
     tea_time: "10:01"
     tea_caption: "Tea_Time"
     tea_resume_time: "10:30"
@@ -97,7 +97,7 @@ schedule:
     second_tea_time: "16:01"
     second_tea_caption: "2nd_Tea"
     second_tea_resume_time: "16:30"
-    eod_time: "19:10"
+    eod_time: "19:05"
 
   saturday:
     start_time: "09:30"
